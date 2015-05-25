@@ -32,9 +32,7 @@ module.exports = function(grunt) {
     i18n_downloader: {
       default_options: {
         options: {
-        },
-        files: {
-          'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
+			'dest' : 'app/locales'
         }
       },
       custom_options: {

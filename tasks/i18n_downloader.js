@@ -1,50 +1,73 @@
 /*
- * grunt-i18n-downloader
- * https://github.com/CatLabInteractive/grunt-i18n-downloader
- *
- * Copyright (c) 2015 Thijs Van der Schaeghe
- * Licensed under the MIT license.
- */
+* grunt-i18n-downloader
+* https://github.com/CatLabInteractive/grunt-i18n-downloader
+*
+* Copyright (c) 2015 Thijs Van der Schaeghe
+* Licensed under the MIT license.
+*/
 
 'use strict';
 
+var http = require('http');
+
 module.exports = function(grunt) {
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
+	// Please see the Grunt documentation for more information regarding task
+	// creation: http://gruntjs.com/creating-tasks
+	function downloadLanguage (language)
+	{
+		grunt.log.writeln ('Fetching ' + language.url);
+		getJSON (getHttpParameters (language.token), function (data) {
+			grunt.file.write ('app/locales/' + language.token + '.json', JSON.stringify (data));
+		});
+	}
 
-  grunt.registerMultiTask('i18n_downloader', 'A grunt task that downloads all available languages from an i18n-tracker', function() {
-    // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
-      punctuation: '.',
-      separator: ', '
-    });
+	function getHttpParameters (language)
+	{
+		var action = 'download';
+		var project = 'quizwitz';
 
-    // Iterate over all specified file groups.
-    this.files.forEach(function(f) {
-      // Concat specified files.
-      var src = f.src.filter(function(filepath) {
-        // Warn on and remove invalid source files (if nonull was set).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
-          return false;
-        } else {
-          return true;
-        }
-      }).map(function(filepath) {
-        // Read file source.
-        return grunt.file.read(filepath);
-      }).join(grunt.util.normalizelf(options.separator));
+		var path = '/' + action + '/' + project;
 
-      // Handle options.
-      src += options.punctuation;
+		if (typeof (language) != 'undefined') {
+			path += '/' + language;
+		}
 
-      // Write the destination file.
-      grunt.file.write(f.dest, src);
+		return {
+			host: 'catlab-translate.herokuapp.com',
+			port: 80,
+			path: path
+		}
+	}
 
-      // Print a success message.
-      grunt.log.writeln('File "' + f.dest + '" created.');
-    });
-  });
+	function getJSON (parameters, callback) {
+		http.get(parameters, function(resp){
+			var rawData = '';
+			resp.on('data', function(chunk){
+				rawData += chunk;
+			});
+
+			resp.on('end', function() {
+				var data = JSON.parse(rawData);
+				callback (data);
+			});
+
+		}).on("error", function(e){
+			console.log("Got error: " + e.message);
+		});
+	}
+
+	grunt.registerMultiTask('i18n_downloader', 'A grunt task that downloads all available languages from an i18n-tracker', function() {
+
+		var done = this.async ();
+
+		grunt.log.writeln ('Fetching language list');
+		getJSON (getHttpParameters (), function (data) {
+			for (var i = 0; i < data.length; i++) {
+				downloadLanguage(data[i]);
+			}
+		});
+		//done ();
+	});
 
 };
