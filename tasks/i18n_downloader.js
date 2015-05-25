@@ -32,7 +32,7 @@ module.exports = function(grunt) {
 
 		var path = '/' + action + '/' + project;
 
-		if (typeof (language) != 'undefined') {
+		if (typeof (language) !== 'undefined') {
 			path += '/' + language;
 
 			path += '?format=' + options.format;
@@ -42,7 +42,7 @@ module.exports = function(grunt) {
 			host: options.src.host,
 			port: options.src.port,
 			path: path
-		}
+		};
 	}
 
 	function getJSON (parameters, callback) {
@@ -80,13 +80,24 @@ module.exports = function(grunt) {
 		grunt.log.writeln ('Fetching language list');
 		getJSON (getHttpParameters (), function (data) {
 			var toProcess = data.length;
+			var languages = [];
+
+			var callback = function () {
+				toProcess --;
+				if (toProcess === 0) {
+					done ();
+				}
+			};
+
 			for (var i = 0; i < data.length; i++) {
-				downloadLanguage (data[i], function () {
-					toProcess --;
-					if (toProcess === 0) {
-						done ();
-					}
+				downloadLanguage (data[i], callback);
+
+				languages.push ({
+					'name' : data[i].name,
+					'token' : data[i].token
 				});
+
+				grunt.file.write (options.dest + '/languages.json', JSON.stringify (languages));
 			}
 		});
 	});

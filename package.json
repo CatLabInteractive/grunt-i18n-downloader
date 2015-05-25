@@ -1,7 +1,7 @@
 {
   "name": "grunt-i18n-downloader",
   "description": "A grunt task that downloads all available languages from an i18n-tracker",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/CatLabInteractive/grunt-i18n-downloader",
   "author": {
     "name": "Thijs Van der Schaeghe",
