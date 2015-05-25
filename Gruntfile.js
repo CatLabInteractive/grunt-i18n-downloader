@@ -32,9 +32,16 @@ module.exports = function(grunt) {
     i18n_downloader: {
       default_options: {
         options: {
-			'dest' : 'app/locales'
+			'dest' : 'app/locales',
+			'src' : {
+				'host' : 'catlab-translate.herokuapp.com',
+				'project' : 'quizwitz',
+				'port' : 80
+			}
         }
-      },
+      }
+
+		/*,
       custom_options: {
         options: {
           separator: ': ',
@@ -44,6 +51,7 @@ module.exports = function(grunt) {
           'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
         }
       }
+      */
     },
 
     // Unit tests.

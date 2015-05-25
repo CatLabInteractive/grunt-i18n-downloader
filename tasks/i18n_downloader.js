@@ -12,13 +12,15 @@ var http = require('http');
 
 module.exports = function(grunt) {
 
+	var options;
+
 	// Please see the Grunt documentation for more information regarding task
 	// creation: http://gruntjs.com/creating-tasks
 	function downloadLanguage (language, callback)
 	{
 		grunt.log.writeln ('Fetching ' + language.url);
 		getJSON (getHttpParameters (language.token), function (data) {
-			grunt.file.write ('app/locales/' + language.token + '.json', JSON.stringify (data));
+			grunt.file.write (options.dest + '/' + language.token + '.json', JSON.stringify (data));
 			callback ();
 		});
 	}
@@ -26,17 +28,19 @@ module.exports = function(grunt) {
 	function getHttpParameters (language)
 	{
 		var action = 'download';
-		var project = 'quizwitz';
+		var project = options.src.project;
 
 		var path = '/' + action + '/' + project;
 
 		if (typeof (language) != 'undefined') {
 			path += '/' + language;
+
+			path += '?format=' + options.format;
 		}
 
 		return {
-			host: 'catlab-translate.herokuapp.com',
-			port: 80,
+			host: options.src.host,
+			port: options.src.port,
 			path: path
 		}
 	}
@@ -60,6 +64,17 @@ module.exports = function(grunt) {
 
 	grunt.registerMultiTask('i18n_downloader', 'A grunt task that downloads all available languages from an i18n-tracker', function() {
 
+		// Merge task-specific and/or target-specific options with these defaults.
+		options = this.options({
+			'dest' : 'app/locales',
+			'src' : {
+				'host' : null,
+				'project' : null,
+				'port' : 80
+			},
+			'format' : 'json'
+		});
+
 		var done = this.async ();
 
 		grunt.log.writeln ('Fetching language list');
@@ -74,7 +89,6 @@ module.exports = function(grunt) {
 				});
 			}
 		});
-		//done ();
 	});
 
 };
