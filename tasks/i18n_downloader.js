@@ -92,10 +92,12 @@ module.exports = function(grunt) {
 			for (var i = 0; i < data.length; i++) {
 				downloadLanguage (data[i], callback);
 
-				languages.push ({
-					'name' : data[i].name,
-					'token' : data[i].token
-				});
+				if (data[i].token !== 'original') {
+					languages.push ({
+						'name' : data[i].name,
+						'token' : data[i].token
+					});
+				}
 
 				grunt.file.write (options.dest + '/languages.json', JSON.stringify (languages));
 			}
