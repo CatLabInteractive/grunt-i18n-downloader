@@ -9,6 +9,7 @@
 'use strict';
 
 var http = require('http');
+var https = require('https');
 
 module.exports = function(grunt) {
 
@@ -46,6 +47,9 @@ module.exports = function(grunt) {
 	}
 
 	function getJSON (parameters, callback) {
+
+		var http = (parameters.port === 443) ? https : http;
+
 		http.get(parameters, function(resp){
 			var rawData = '';
 			resp.on('data', function(chunk){
