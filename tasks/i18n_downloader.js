@@ -76,7 +76,8 @@ module.exports = function(grunt) {
 				'project' : null,
 				'port' : 80
 			},
-			'format' : 'json'
+			'format' : 'json',
+			'onlyOriginal' : false,
 		});
 
 		var done = this.async ();
@@ -96,7 +97,10 @@ module.exports = function(grunt) {
 			for (var i = 0; i < data.length; i++) {
 				downloadLanguage (data[i], callback);
 
-				if (data[i].token !== 'original') {
+				if (
+					data[i].token !== 'original' &&
+					!options.onlyOriginal
+				) {
 					languages.push ({
 						'name' : data[i].name,
 						'token' : data[i].token
